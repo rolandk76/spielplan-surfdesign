@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=spielplan
+      - DB_USERNAME=spielplan_user
+      - DB_PASSWORD=secure_password
+    depends_on:
+      - db
+    volumes:
+      - ./storage:/var/www/html/storage
+    networks:
+      - spielplan-network
+
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=spielplan
+      - MYSQL_USER=spielplan_user
+      - MYSQL_PASSWORD=secure_password
+      - MYSQL_ROOT_PASSWORD=root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - spielplan-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=spielplan_user
+      - PMA_PASSWORD=secure_password
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - spielplan-network
+
+volumes:
+  mysql_data:
+
+networks:
+  spielplan-network:
+    driver: bridge
