@@ -37,6 +37,9 @@ venv/
 .env.*
 .env.local
 
+# Exceptions to allow example env to be committed
+!.env.example
+
 # Editors/IDEs
 .vscode/
 .idea/
