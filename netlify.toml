@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+
+# Environment variables for production
+[build.environment]
+  VITE_USE_DB = "true"
+
+# SPA Fallback so dass Client-Routing funktioniert
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,5 @@
+{
+  "name": "Spielplan Generator",
+  "description": "Eine React-Anwendung zur Erstellung und Verwaltung von Turnierplänen für verschiedene Sportarten. Benutzer können Teams, Spielmodus und andere Einstellungen festlegen, um automatisch einen Spielplan und eine Live-Tabelle zu generieren.",
+  "requestFramePermissions": []
+}

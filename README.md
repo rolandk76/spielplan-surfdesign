@@ -2,54 +2,58 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Spielplan – Forge Deployment (PHP + MySQL)
+# Spielplan – PHP (ohne API) + MySQL/MariaDB
 
-Dieses Repository ist für das Hosting auf Laravel Forge vorbereitet. Es enthält eine minimale PHP-App unter `public/` mit einer MySQL-Verbindung sowie ein MySQL-Schema, das aus einem PostgreSQL-Dump konvertiert wurde.
+Diese App läuft klassisch als PHP‑Site und spricht direkt mit MySQL/MariaDB. Keine Netlify/Vercel Functions, kein separater Node‑API‑Server nötig.
 
 ## Struktur
 
-- `public/index.php` – Einstiegspunkt der App (Document Root auf Forge auf `public/` setzen)
-- `mysql_schema.sql` – MySQL-Schema (Tabellen `tournaments`, `users`)
-- `neon_backup.sql` – ursprünglicher PostgreSQL-Dump (Quelle)
-- `.env.example` – Beispiel-Umgebungsvariablen für die Datenbank
+- `public/` – Document Root der App
+  - `index.php` – Übersicht (DB‑Status, Turnierliste, Aktionen)
+  - `_bootstrap.php` – .env laden und PDO‑Verbindung (`db_pdo()`)
+  - `tournament_new.php` – neues Turnier anlegen
+  - `tournament_view.php` – Turnier anzeigen
+  - `tournament_edit.php` – Turnier bearbeiten
+  - `tournament_delete.php` – Turnier löschen
+- `mysql_schema.sql` – MySQL‑Schema (Tabellen `tournaments`, `users`)
+- `mariadb_schema.sql` – Schema für MariaDB 10.4 (XAMPP)
+- `mysql_data.sql` – Beispiel‑Daten (aus Postgres konvertiert)
+- `.env.example` – Beispiel‑ENV für DB‑Zugang
 
-## Voraussetzungen
+React/Vite‑Dateien sind weiterhin im Repo (z. B. `App.tsx`), werden für den PHP‑Betrieb aber nicht benötigt.
 
-- PHP (Forge-Server), empfohlen PHP 8.2 oder 8.3
-- MySQL 8.0+
+## Lokale Einrichtung (XAMPP/MariaDB)
 
-## Deployment auf Forge
-
-1. Repository verbinden: `rolandk76/spielplan-surfdesign`, Branch `main`.
-2. Site erstellen: Typ „PHP“, Document Root: `public`.
-3. Environment anlegen: `.env` basierend auf `.env.example` mit deinen DB-Zugangsdaten.
-4. (Optional) SSL via Let’s Encrypt aktivieren.
-
-## Datenbank einrichten
-
-1. Auf Forge eine MySQL-Datenbank + Benutzer erstellen (z. B. DB `spielplan`, User `forge`).
-2. Schema importieren:
-   ```bash
-   mysql -u <user> -p -h <host> -P 3306 <db_name> < mysql_schema.sql
+1. `.env` im Projektroot anlegen (oder vorhandene prüfen):
+   ```env
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=spielplan
+   DB_USERNAME=root
+   DB_PASSWORD=
+   JWT_SECRET=dev-secret
    ```
-3. (Optional) Daten migrieren: Der bereitgestellte PostgreSQL-Dump `neon_backup.sql` enthält Daten. Für einen direkten Import in MySQL müssen die INSERTs konvertiert werden (JSON bleibt, Timestamps ohne Zeitzone, UUIDs als `CHAR(36)`). Falls gewünscht, können wir ein konvertiertes `mysql_data.sql` erzeugen.
-
-## Lokales Testen
-
-1. `.env` anlegen (siehe `.env.example`).
-2. Einen lokalen MySQL-Server bereitstellen und `mysql_schema.sql` importieren.
-3. Einen PHP-Server starten (z. B. Symfony/PHP built-in):
+2. Datenbank anlegen und Schema importieren (XAMPP Mac – root ohne Passwort):
    ```bash
-   php -S 127.0.0.1:8000 -t public
+   /Applications/XAMPP/bin/mysql -u root -h 127.0.0.1 -P 3306 -e "CREATE DATABASE IF NOT EXISTS spielplan CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   /Applications/XAMPP/bin/mysql -u root -h 127.0.0.1 -P 3306 spielplan < mariadb_schema.sql
+   /Applications/XAMPP/bin/mysql -u root -h 127.0.0.1 -P 3306 spielplan < mysql_data.sql  # optional
    ```
-4. Öffne `http://127.0.0.1:8000` – die Startseite zeigt die DB-Verbindung und listet optional `tournaments`.
+3. PHP‑Server starten (Document Root `public/`):
+   ```bash
+   php -S 127.0.0.1:8001 -t public
+   ```
+4. Öffnen: http://127.0.0.1:8001
 
-## Hinweise zur Konvertierung (PostgreSQL → MySQL)
+## Deployment (z. B. Forge oder Shared Hosting)
 
-- `jsonb` → `JSON`
-- `timestamp with time zone` → `DATETIME(6)` (Zeitzonenanteil entfernen)
-- `uuid` → `CHAR(36)`
-- `DEFAULT now()` → `CURRENT_TIMESTAMP(6)`
-- Schema-Präfixe (`public.`) und Typ-Casts (`::jsonb`) wurden entfernt.
+1. Server mit PHP 8.2/8.3, MySQL/MariaDB bereitstellen.
+2. Document Root auf `public/` setzen.
+3. `.env` mit DB‑Zugang auf dem Server anlegen.
+4. Schema importieren (`mysql_schema.sql` oder `mariadb_schema.sql` je nach Server), optional `mysql_data.sql`.
 
-Wenn du die Daten aus `neon_backup.sql` in MySQL benötigst, sag Bescheid – ich generiere ein passendes `mysql_data.sql` und liefere die Import-Befehle mit.
+## Hinweise
+
+- In MariaDB 10.4 wird JSON als LONGTEXT gespeichert. `mariadb_schema.sql` berücksichtigt das.
+- `settings` und `matches` werden als JSON‑Strings in der DB abgelegt und in der Oberfläche angezeigt/bearbeitet.
+- Möchtest du die Formular‑UI (Teams/Felder/Spielzeiten) statt JSON? Dann kann man `tournament_new.php`/`tournament_edit.php` entsprechend ausbauen.

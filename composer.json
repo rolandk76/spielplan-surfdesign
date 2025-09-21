@@ -1,0 +1,99 @@
+{
+    "name": "rolandk76/spielplan-generator",
+    "description": "Ein moderner Turnier-Spielplan Generator für Indiaca und andere Sportarten mit dynamischen Playoff-Paarungen",
+    "type": "project",
+    "version": "2.0.0",
+    "keywords": [
+        "tournament",
+        "scheduler", 
+        "sports",
+        "indiaca",
+        "playoff",
+        "round-robin",
+        "react",
+        "typescript"
+    ],
+    "homepage": "https://spielplan-generator-roland3.netlify.app/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Roland Kalfhues",
+            "email": "rolandkalfhues@example.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/rolandk76/spielplan-generator/issues",
+        "source": "https://github.com/rolandk76/spielplan-generator"
+    },
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "squizlabs/php_codesniffer": "^3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "SpielplanGenerator\\": "src/php/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SpielplanGenerator\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "cs-check": "phpcs --standard=PSR12 src/",
+        "cs-fix": "phpcbf --standard=PSR12 src/",
+        "build": "npm run build",
+        "dev": "npm run dev",
+        "deploy": "npm run build && netlify deploy --prod",
+        "setup": [
+            "npm install",
+            "composer install"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/installers": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "2.0-dev"
+        },
+        "project-info": {
+            "frontend": {
+                "framework": "React + TypeScript",
+                "build-tool": "Vite",
+                "ui-library": "Tailwind CSS",
+                "deployment": "Netlify"
+            },
+            "features": [
+                "Dynamic playoff pairings",
+                "Round-robin tournaments", 
+                "Real-time score tracking",
+                "Tournament versioning",
+                "Audit logging",
+                "Print-friendly schedules",
+                "Mobile responsive design",
+                "Dark mode support",
+                "Tournament backup/restore"
+            ],
+            "supported-sports": [
+                "Indiaca",
+                "Volleyball", 
+                "Badminton",
+                "Tennis",
+                "Table Tennis",
+                "Generic ball sports"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
